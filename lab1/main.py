@@ -1,83 +1,73 @@
-from operations import add_numbers, subtract_numbers, multiply_numbers, divide_numbers, float_to_ieee754, add_ieee754, ieee754_to_float
-from binary_converter import to_binary, to_complement, binary_to_decimal
-from constants import BIT_SIZE
-
-def display_codes(num, label):
-    """Выводит коды числа."""
-    direct = to_binary(num, BIT_SIZE)
-    inverse = [1 - bit if i > 0 and direct[0] == 1 else bit for i, bit in enumerate(direct)]
-    complement = to_complement(direct)
-    print(f"{label}: {num}")
-    print(f"Прямой код: {direct}")
-    print(f"Обратный код: {inverse}")
-    print(f"Дополнительный код: {complement}")
+from num_operations import *
 
 def main():
-    """Основная функция программы."""
-    # Сложение
-    print("Сложение в дополнительном коде:")
-    num1 = int(input("Ввод числа №1: "))
-    display_codes(num1, "Число введено")
-    num2 = int(input("Ввод числа №2: "))
-    display_codes(num2, "Число введено")
-    result = add_numbers(num1, num2)
-    decimal_result = binary_to_decimal(result)
-    print(f"Результат: {decimal_result}")
-    display_codes(decimal_result, "Число введено")
+    print("Программа для операций с числами запущена!")
+    while True:
+        print("\nМеню операций:")
+        print("1. Работа с целыми числами (конвертация, сложение, вычитание, умножение, деление)")
+        print("2. Сложение чисел с плавающей точкой (IEEE-754)")
+        print("3. Завершить программу")
+        user_choice = input("Выберите опцию: ")
 
-    # Вычитание
-    print("\nВычитание в дополнительном коде:")
-    num1 = int(input("Ввод числа №1: "))
-    display_codes(num1, "Число введено")
-    num2 = int(input("Ввод числа №2: "))
-    display_codes(num2, "Число введено")
-    result = subtract_numbers(num1, num2)
-    decimal_result = binary_to_decimal(result)
-    print(f"Результат: {decimal_result}")
-    display_codes(decimal_result, "Число введено")
+        if user_choice == "1":
+            try:
+                number1 = int(input("Введите первое целое число: "))
+                number2 = int(input("Введите второе целое число: "))
+            except ValueError:
+                print("Ошибка: введите корректные целые числа.")
+                continue
 
-    # Умножение
-    print("\nУмножение в прямом коде:")
-    num1 = int(input("Ввод числа №1: "))
-    display_codes(num1, "Число введено")
-    num2 = int(input("Ввод числа №2: "))
-    display_codes(num2, "Число введено")
-    result = multiply_numbers(num1, num2)
-    decimal_result = binary_to_decimal(result)
-    print(f"multiply result (binary): {result}")
-    print(f"Результат: {decimal_result}")
-    display_codes(decimal_result, "Число введено")
+            print("\nРезультаты конвертации в двоичный формат:")
+            print(f"Прямой код для {number1}: {num_to_signed_magnitude(number1)}")
+            print(f"Обратный код для {number1}: {num_to_ones_complement(number1)}")
+            print(f"Дополнительный код для {number1}: {num_to_twos_complement(number1)}")
+            print(f"Прямой код для {number2}: {num_to_signed_magnitude(number2)}")
+            print(f"Обратный код для {number2}: {num_to_ones_complement(number2)}")
+            print(f"Дополнительный код для {number2}: {num_to_twos_complement(number2)}")
 
-    # Деление
-    print("\nДеление в прямом коде:")
-    num1 = int(input("Ввод числа №1: "))
-    display_codes(num1, "Число введено")
-    num2 = int(input("Ввод числа №2: "))
-    display_codes(num2, "Число введено")
-    try:
-        int_part, frac_part = divide_numbers(num1, num2)
-        int_value = binary_to_decimal(int_part)
-        frac_value = sum(b * (2 ** -(i + 1)) for i, b in enumerate(frac_part))
-        decimal_result = int_value + frac_value if int_value >= 0 else int_value - frac_value
-        print(f"int_part (binary): {int_part}, int_value: {int_value}, frac_value: {frac_value}")
-        print(f"Результат: {decimal_result:.5f}")
-        print(f"Целая часть (прямой код): {int_part}")
-        print(f"Дробная часть (двоичный): {frac_part}")
-    except ValueError as e:
-        print(f"Ошибка: {e}")
+            result_bin_sum, result_dec_sum = twos_complement_sum(number1, number2)
+            print(f"\nСложение ({number1} + {number2}):")
+            print(f"Результат в двоичном виде: {result_bin_sum}")
+            print(f"Результат в десятичном виде: {result_dec_sum}")
 
-    # IEEE-754
-    print("\nСложение чисел с плавающей точкой (IEEE-754):")
-    num1 = float(input("Ввод числа №1: "))
-    bin1 = float_to_ieee754(num1)
-    print(f"Число {num1} в IEEE-754: {bin1}")
-    num2 = float(input("Ввод числа №2: "))
-    bin2 = float_to_ieee754(num2)
-    print(f"Число {num2} в IEEE-754: {bin2}")
-    result = add_ieee754(num1, num2)
-    decimal_result = ieee754_to_float(result)
-    print(f"Результат: {decimal_result:.5f}")
-    print(f"Результат в IEEE-754: {result}")
+            result_bin_diff, result_dec_diff = twos_complement_diff(number1, number2)
+            print(f"\nВычитание ({number1} - {number2}):")
+            print(f"Результат в двоичном виде: {result_bin_diff}")
+            print(f"Результат в десятичном виде: {result_dec_diff}")
+
+            result_bin_mul, result_dec_mul = signed_multiply(number1, number2)
+            print(f"\nУмножение ({number1} * {number2}):")
+            print(f"Результат в двоичном виде: {result_bin_mul}")
+            print(f"Результат в десятичном виде: {result_dec_mul}")
+
+            if number2 == 0:
+                print("\nОшибка: деление на ноль невозможно!")
+            else:
+                result_bin_div, result_dec_div = signed_divide(number1, number2)
+                print(f"\nДеление ({number1} / {number2}):")
+                print(f"Результат в двоичном виде: {result_bin_div}")
+                print(f"Результат в десятичном виде: {result_dec_div}")
+
+        elif user_choice == "2":
+            try:
+                float_num1 = float(input("Введите первое число с плавающей точкой: "))
+                float_num2 = float(input("Введите второе число с плавающей точкой: "))
+            except ValueError:
+                print("Ошибка: введите корректные числа с плавающей точкой.")
+                continue
+
+            ieee_sum = float_add_ieee(float_num1, float_num2)
+            decimal_sum = ieee754_to_num(ieee_sum)
+            print(f"\nСложение в формате IEEE-754 ({float_num1} + {float_num2}):")
+            print(f"Результат в двоичном виде: {ieee_sum}")
+            print(f"Результат в десятичном виде: {decimal_sum}")
+
+        elif user_choice == "3":
+            print("Программа завершена.")
+            break
+
+        else:
+            print("Ошибка: выберите опцию 1, 2 или 3.")
 
 if __name__ == "__main__":
     main()
