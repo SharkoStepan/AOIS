@@ -1,46 +1,32 @@
-from logic_parser import generate_truth_table, print_truth_table
-from minimizer import (
-    minimize_sdnf_calc_method, minimize_sknf_calc_method,
-    minimize_sdnf_table_method, minimize_sknf_table_method,
-    minimize_sdnf_kmap_method, minimize_sknf_kmap_method
-)
+from log_parser import *
+from evaluator import *
+from minimizer import *
 
 def main():
+    input_str = input("Enter a logical formula: ").strip()
+    input_str = remove_spaces(input_str)
+
+    if not is_valid_symbols(input_str):
+        print("Error: Invalid symbols in the formula.")
+        return
+
+    if not check_parentheses(input_str):
+        print("Error: Unbalanced parentheses.")
+        return
+
+    variables = extract_variables(input_str)
+    tokens = tokenize(input_str)
+    if not tokens:
+        print("Error: Tokenization failed.")
+        return
+
+    postfix = shunting_yard(tokens)
+
     try:
-        expr = input("Введите логическую функцию (операторы: ! & | ->, переменные: a,b,c,d,e):\n")
-        variables, table = generate_truth_table(expr)
-
-        print("\nТаблица истинности:")
-        print_truth_table(variables, table)
-
-        print("\nМинимизация СДНФ (расчетный метод):")
-        result_sdnf_calc = minimize_sdnf_calc_method(variables, table)
-        print(f"Результат: {result_sdnf_calc}")
-
-        print("\nМинимизация СКНФ (расчетный метод):")
-        result_sknf_calc = minimize_sknf_calc_method(variables, table)
-        print(f"Результат: {result_sknf_calc}")
-
-        print("\nМинимизация СДНФ (табличный метод):")
-        result_sdnf_table = minimize_sdnf_table_method(variables, table)
-        print(f"Результат: {result_sdnf_table}")
-
-        print("\nМинимизация СКНФ (табличный метод):")
-        result_sknf_table = minimize_sknf_table_method(variables, table)
-        print(f"Результат: {result_sknf_table}")
-
-        print("\nМинимизация СДНФ (метод карты Карно):")
-        result_sdnf_kmap = minimize_sdnf_kmap_method(variables, table)
-        print(f"Результат: {result_sdnf_kmap}")
-
-        print("\nМинимизация СКНФ (метод карты Карно):")
-        result_sknf_kmap = minimize_sknf_kmap_method(variables, table)
-        print(f"Результат: {result_sknf_kmap}")
-
-    except ValueError as e:
-        print(f"Ошибка: {e}")
+        truth_table = generate_truth_table(variables, postfix)
+        print_truth_table(variables, truth_table)
     except Exception as e:
-        print(f"Произошла непредвиденная ошибка: {e}")
+        print(f"Error: {e}")
 
 if __name__ == "__main__":
     main()
